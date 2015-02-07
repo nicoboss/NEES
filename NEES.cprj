@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<DOCUMENT>
+  <IDEVersion value="543"/>
+  <LibraryForm.rsPropSaver1>
+    <LMDCheckListBox1.Items value="DCF_Lib.cc&cr;&lf;IntFunc_Lib.cc&cr;&lf;Key_Lib.cc&cr;&lf;LCD_Lib.cc&cr;&lf;String_Lib.cc&cr;&lf;"/>
+    <LMDStrList1.Items value="0&cr;&lf;1&cr;&lf;0&cr;&lf;0&cr;&lf;0&cr;&lf;"/>
+  </LibraryForm.rsPropSaver1>
+  <Projects>
+    <Proj1>
+      <PrjChip value="1"/>
+      <PrjName value="NEES"/>
+      <PrjOptions value="0"/>
+      <Files>
+        <0 value="NEES.cc"/>
+      </Files>
+    </Proj1>
+  </Projects>
+</DOCUMENT>
