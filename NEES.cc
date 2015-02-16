@@ -72,9 +72,9 @@ void main(void)
             //0.99242023
             //4.16666667*D+4.16666667
 
-            Delay=4.16666667*Wurzel(0.99242023,ADC)-4.16666667; //Known Issue: Wrong equation or why did I got always so small values?
+            Delay=4.16666667*Power(1.0076376617191691,ADC)-4.16666667;
 
-            Msg_WriteFloat(Wurzel(49.0,7.0));
+            //Msg_WriteFloat(Power(2.0,7));
             Msg_WriteChar(13);
             Msg_WriteFloat(SinPos);
             Msg_WriteChar(13);
@@ -105,20 +105,20 @@ void main(void)
 
             if(ADC<512)
             {
-                Faktor=1.8*Wurzel(0.996172235,511-ADC)-0.8;
+                Faktor=1.8*Power(1.003842473,511-ADC)-0.8;
             } else {
-                Faktor=1/(1.8*Wurzel(0.996172235,1023-ADC)-0.8);
+                Faktor=1/(1.8*Power(1.003842473,1023-ADC)-0.8);
             }
 
             Delay1=(Delay*Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
             Delay2=(Delay/Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
 
-        } else if(Modi==2) { //Pitchwahl => Sinus   Known Issue: Wrong equation it have to be one with ACD=0=>0, ADC=511=>1/3 and ADC=1023=>1 and also I'll upload me Ti-Nspire decument to GitHub
+        } else if(Modi==2) { //Pitchwahl => Sinus
             if(ADC>940)
             {
                 Sinusfaktor=0;
             } else {
-                Sinusfaktor=0.642857*Wurzel(0.99661453923,ADC)-0.642857;
+                Sinusfaktor=0.642857*Power(0.996614539,ADC)-0.642857;
             }
 
             Msg_WriteFloat(SinPos);
@@ -143,7 +143,7 @@ void main(void)
 
 
         } else if(Modi==3) { //Random mode
-            Delay=0.33333333*Wurzel(0.99864579,ADC)-0.33333333;
+            Delay=0.33333333*Power(1.00135604637,ADC)-0.33333333;
 
             //The .0 is extreamly importent because outherwise it doesen uses floats!
             Delay1=Delay*(rand()/65536.0);
@@ -180,7 +180,52 @@ float Sinus(float x) //Based on Taylor's theorem    Bogenmass! Achtung nur genau
     //return(x-f2/6+f2*f1/120)
 }
 
-float Wurzel(float W, float D) //Babylonian method or Heron's method works with the Heron's formula.
+float Power(float a, int x)
+{
+    if(x==0) return 1;
+    if(x==1) return x;
+    if(x<1) return false;
+
+    int i;
+    unsigned int z_erg;
+    unsigned int z_temp;
+    float p_erg;
+    float p[100];
+    float z_list[100];
+    p[0]=a;
+    z_list[0]=1;
+    for(i=1;i<100;i++)
+    {
+        p[i]=p[i-1]*p[i-1];
+
+        z_list[i]=z_list[i-1]+z_list[i-1];
+        //cout << p[i] << " " << z_list[i] << endl;
+        if(z_list[i]>x) goto Power_calculate;
+    }
+    return false;
+
+    Power_calculate:;
+    //cout << endl;
+    z_erg=z_list[i-1];
+    p_erg=p[i-1];
+    //cout << p_erg << " & " << z_erg << endl;
+    for(;i>0;i--)
+    {
+        z_temp=z_erg+z_list[i-1];
+        if(z_temp<=x)
+        {
+            z_erg=z_temp;
+            p_erg=p_erg*p[i-1];
+            //cout << z_temp << endl;
+            if(z_erg==x) break;
+        }
+    }
+    //cout << i << endl;
+    return p_erg;
+}
+
+
+float QWurzel(float W, float D) //Babylonian method or Heron's method works with the Heron's formula.
 {
     //do {
     int i;
