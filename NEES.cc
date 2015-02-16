@@ -72,11 +72,15 @@ void main(void)
             //0.99242023
             //4.16666667*D+4.16666667
 
-            Delay=4.16666667*Wurzel(0.99242023,ADC)+4.16666667; //Known Issue: Wrong equation or why did I got always so small values?
+            Delay=4.16666667*Wurzel(0.99242023,ADC)-4.16666667; //Known Issue: Wrong equation or why did I got always so small values?
 
+            Msg_WriteFloat(Wurzel(49.0,7.0));
+            Msg_WriteChar(13);
             Msg_WriteFloat(SinPos);
             Msg_WriteChar(13);
             Msg_WriteFloat(Sinus(SinPos));
+            Msg_WriteChar(13);
+            Msg_WriteFloat(ADC);
             Msg_WriteChar(13);
             Msg_WriteFloat(Faktor);
             Msg_WriteChar(13);
@@ -117,11 +121,29 @@ void main(void)
                 Sinusfaktor=0.642857*Wurzel(0.99661453923,ADC)-0.642857;
             }
 
+            Msg_WriteFloat(SinPos);
+            Msg_WriteChar(13);
+            Msg_WriteFloat(Sinus(SinPos));
+            Msg_WriteChar(13);
+            Msg_WriteFloat(ADC);
+            Msg_WriteChar(13);
+            Msg_WriteFloat(Sinusfaktor);
+            Msg_WriteChar(13);
+            Msg_WriteFloat(Delay);
+            Msg_WriteChar(13);
+
             Delay1=(Delay*Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
             Delay2=(Delay/Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
 
+            Msg_WriteFloat(Delay1);
+            Msg_WriteChar(13);
+            Msg_WriteFloat(Delay2);
+            Msg_WriteChar(10);
+            Msg_WriteChar(13);
+
+
         } else if(Modi==3) { //Random mode
-            Delay=4.16666667*Wurzel(0.99242023,ADC)+4.16666667;
+            Delay=0.33333333*Wurzel(0.99864579,ADC)-0.33333333;
 
             //The .0 is extreamly importent because outherwise it doesen uses floats!
             Delay1=Delay*(rand()/65536.0);
@@ -164,7 +186,7 @@ float Wurzel(float W, float D) //Babylonian method or Heron's method works with 
     int i;
     for(i=0;i<7;i++) //A lover value then 7 will improve the speed much but the calculation will be more inaccurate.
     {
-        D=(D+W/D)/2;
+        D=(D+W/D)/2.0;
     }
     //} while((D*D-W)*(D*D-W)<0.00001);
     return D;

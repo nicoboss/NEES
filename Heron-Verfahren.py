@@ -1,8 +1,10 @@
-D=2.0
-w=49.0
+a=3.0
+b=3.123
 i=0
-while((D*D-w)*(D*D-w)>0.000000000000000000001):
-    D=(D+w/D)/2.0
-    i+=1
+D=0
+for i in range(20):
+    for j in range(b/(i+1)):
+        D+=a*a
+    
 print(i)
 print(D)
