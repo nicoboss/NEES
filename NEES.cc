@@ -8,6 +8,7 @@ word Delay2;
 word ADC;
 float Faktor;
 float SinPos;
+char SinStepV;
 float SinStep;
 float Sinusfaktor;
 float Pi;
@@ -32,9 +33,10 @@ void main(void)
     Pi=3.14159265359;
     Modi=0;
     SinPos=0;
-    SinStep=Pi/77;
+    SinStep=Pi/50;
     Faktor=1;
     Sinusfaktor=1;
+    SinStepV=1;
 
 
     while(1)
@@ -45,7 +47,7 @@ void main(void)
             if(Port_ReadBit(SW2)==0)
             {
                 Modi++;
-                if(Modi>=4) Modi=0;
+                if(Modi>=5) Modi=0;
                 Msg_WriteInt(Modi);
                 Msg_WriteChar(10);
                 Msg_WriteChar(13);
@@ -54,12 +56,15 @@ void main(void)
             }
         }
 
+        //Msg_WriteFloat(SinStep);
+        //Msg_WriteChar(13);
+
         if(SinPos>Pi/2 || SinPos<-Pi/2)
         {
-            SinStep=SinStep*-1;
+            SinStepV=SinStepV*-1;
         }
 
-        SinPos=SinPos+SinStep;
+        SinPos=SinPos+(SinStep*SinStepV);
         //Faktor=(Sinus(SinPos)/Sinusfaktor)+1+(1/Sinusfaktor); 2 1.5+0.5=2
         //Faktor=Sinusfaktor;
 
@@ -74,6 +79,7 @@ void main(void)
 
             Delay=4.16666667*Power(1.0076376617191691,ADC)-4.16666667;
 
+            /*
             //Msg_WriteFloat(Power(2.0,7));
             Msg_WriteChar(13);
             Msg_WriteFloat(SinPos);
@@ -86,17 +92,18 @@ void main(void)
             Msg_WriteChar(13);
             Msg_WriteFloat(Delay);
             Msg_WriteChar(13);
+            */
 
             Delay1=(Delay*Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
             Delay2=(Delay/Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
 
+            /*
             Msg_WriteFloat(Delay1);
             Msg_WriteChar(13);
             Msg_WriteFloat(Delay2);
             Msg_WriteChar(10);
             Msg_WriteChar(13);
-
-
+            */
 
         } else if(Modi==1) { //Verhältnisswahl
             //1.8*1.00384247^ADC-0.8
@@ -107,55 +114,40 @@ void main(void)
             {
                 Faktor=1.8*Power(1.003842473,511-ADC)-0.8;
             } else {
-                Faktor=1/(1.8*Power(1.003842473,1023-ADC)-0.8);
+                Faktor=1/(1.8*Power(1.003842473,ADC-512)-0.8); //511-(1024-ADC)=ADC-512
             }
 
             Delay1=(Delay*Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
             Delay2=(Delay/Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
 
-        } else if(Modi==2) { //Pitchwahl => Sinus
-            if(ADC>940)
+        } else if(Modi==2) { //Sinusfrequenz
+                SinStep=Pi/(5.987531172*Power(1.004344556,ADC)-4.987531172);
+                //Msg_WriteFloat(SinStep);
+                //Msg_WriteChar(13);
+
+                Delay1=(Delay*Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
+                Delay2=(Delay/Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
+         } else if(Modi==3) { //Pitchwahl => Sinus
+            if(ADC>950)
+            {
+                Sinusfaktor=1;
+            }
+            else if(ADC<60)
             {
                 Sinusfaktor=0;
             } else {
-                Sinusfaktor=0.642857*Power(0.996614539,ADC)-0.642857;
+                Sinusfaktor=-1.06666667*Power(0.99708574,ADC)+1.06666667; //From 0 to 950
             }
-
-            Msg_WriteFloat(SinPos);
-            Msg_WriteChar(13);
-            Msg_WriteFloat(Sinus(SinPos));
-            Msg_WriteChar(13);
-            Msg_WriteFloat(ADC);
-            Msg_WriteChar(13);
-            Msg_WriteFloat(Sinusfaktor);
-            Msg_WriteChar(13);
-            Msg_WriteFloat(Delay);
-            Msg_WriteChar(13);
 
             Delay1=(Delay*Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
             Delay2=(Delay/Faktor)*(Sinus(SinPos)*Sinusfaktor+1);
 
-            Msg_WriteFloat(Delay1);
-            Msg_WriteChar(13);
-            Msg_WriteFloat(Delay2);
-            Msg_WriteChar(10);
-            Msg_WriteChar(13);
 
+        } else if(Modi==4) { //Random mode (with Sinus)
 
-        } else if(Modi==3) { //Random mode
-            Delay=0.33333333*Power(1.00135604637,ADC)-0.33333333;
-
-            //The .0 is extreamly importent because outherwise it doesen uses floats!
-            Delay1=Delay*(rand()/65536.0);
-            Delay2=Delay*(rand()/65536.0);
-
-            //Msg_WriteFloat(Delay1);
-            //Msg_WriteChar(13);
-            //Msg_WriteFloat(Delay2);
-            //Msg_WriteChar(10);
-            //Msg_WriteChar(13);
-
-        } else { //Nichts Abfragen
+            //The .0 is extreamly importent because outherwise it doesen't uses floats!
+            Delay1=(rand()*2.0)/(1023-ADC);
+            Delay2=(rand()*2.0)/(1023-ADC);
         }
 
         Port_WriteBit(23,PORT_ON);
